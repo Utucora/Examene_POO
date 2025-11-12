@@ -1,0 +1,176 @@
+🔹 I. STRUCTURA DE BAZĂ A UNEI CLASE
+O clasă în Java e șablonul pentru obiecte.
+O clasă poate conține:
+Atribute (fields) → starea obiectului
+Metode → comportamentul obiectului
+Constructori → inițializează obiectele
+Blocuri static / initializer
+Clase interne / enum / inte
+
+public class Student {
+    private String name;      // atribut
+    private int year;
+
+    // Constructor
+    public Student(String name, int year) {
+        this.name = name;
+        this.year = year;
+    }
+
+    // Metodă
+    public void print() {
+        System.out.println(name + " " + year);
+    }
+}
+
+
+
+🔹 II. STATIC
+static = membru aparținând clasei, nu instanței.
+
+class Counter {
+    static int count = 0;  // comun tuturor obiectelor
+    Counter() { count++; }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        new Counter();
+        new Counter();
+        System.out.println(Counter.count); // 2
+    }
+}
+
+
+static → accesat fără obiect (Counter.count)
+metodele static nu pot accesa membri non-statici
+static poate fi folosit și pentru blocuri de inițializare:
+
+
+
+🔹 III. THIS
+this = referință la obiectul curent.
+Folosiri:
+
+1. Deosebește parametrii de câmpuri:
+
+this.name = name;
+
+2. Apelează alți constructori:
+public Student(String name) {
+    this(name, 1);
+}
+
+3. Poate fi returnat:
+public Student getSelf() { return this; }
+
+🔹 IV. SUPER
+super = referință la superclasă (părinte).
+Folosiri:
+
+1. Apelează constructorul superclasei:
+
+class A { A(String s) {} }
+class B extends A {
+    B() { super("hello"); }
+}
+
+
+2.
+
+Accesează metode / câmpuri suprascrise:
+class Parent { void show() { System.out.println("Parent"); } }
+class Child extends Parent {
+    void show() {
+        super.show(); // apelează metoda din Parent
+        System.out.println("Child");
+    }
+}
+
+Reguli:
+apelul super() trebuie să fie prima linie în constructor
+dacă nu este scris explicit, se apelează implicit super() (fără parametri)
+
+
+⚙️ Recapitulare scurtă:
+Concept	Reprezintă	     Poate accesa membri instanță?	Poate fi folosit în static?
+static	aparține clasei	               ❌	                        ✅
+this	  instanța curentă	             ✅                         ❌
+super	  superclasa	                   ✅	                        ❌
+
+
+
+
+✅ ÎNTREBAREA 1
+class A { static int x = 10; }
+class B extends A { static int x = 20; }
+
+public class Test {
+    public static void main(String[] args) {
+        A a = new B();
+        System.out.println(a.x);
+    }
+}
+
+A. 10
+B. 20
+C. eroare la compilare
+D. null
+
+
+🟩 Răspuns corect: A. 10
+Explicație:
+x este static, deci aparține clasei, nu obiectului.
+Deși faci new B(), referința este de tip A, deci variabila statică se rezolvă la tipul compile-time, nu runtime.
+Deci a.x este același cu A.x
+
+👉 Upcasting: A a = new B(); înseamnă:
+Obiectul real este B (instanță a subclasei).
+Referința este de tip A (superclasă).
+Se pot accesa doar membrii (metode/câmpuri) vizibili în tipul A.
+Pentru metode override, se apelează implementarea din B (dynamic dispatch).
+Pentru câmpuri statici, nu există overriding, deci se ia A.x
+
+🔹 Ce e upcast-ul (foarte important la examen):
+Upcast = conversia unei referințe de subclasă la o referință de superclasă.
+Exemplu:
+Dog d = new Dog();
+Animal a = d; // upcast
+Sigur, automat, fără cast.
+Scop: tratăm mai multe tipuri ca pe un singur tip comun.
+Exemplu practic:
+List<String> list = new ArrayList<>();
+— ArrayList e subclasă, List e super-interfață ⇒ upcast util.
+
+🔹 Ce e downcast-ul:
+Downcast = transformarea unei referințe de superclasă în subclasă.
+Exemplu:
+Animal a = new Dog();
+Dog d = (Dog) a; // downcast corect
+Dar:
+Animal a = new Animal();
+Dog d = (Dog) a; // ClassCastException!
+
+⚠️ Downcast greșit → runtime error (ClassCastException)
+💣 Capcane la examen:
+Static vs override — static se rezolvă la compile-time, override la run-time.
+“Ce se afișează dacă metoda e statică?” — întotdeauna se folosește tipul referinței.
+“Upcastul este întotdeauna sigur?” ✅
+“Downcastul este întotdeauna sigur?” ❌ (poate da excepție).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
