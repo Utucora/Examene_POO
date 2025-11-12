@@ -1,0 +1,10 @@
+Domeniu	        Ce trebuie știut perfect
+Clase	          structura, static, this, super
+Moștenire	      extends, upcast, downcast, overriding, overloading
+Abstractizare  	abstract vs interface, default methods
+Clase interne	  tipuri + acces la outer
+Colecții	      HashSet, ArrayList, HashMap, TreeSet
+Excepții	      try-catch-finally, ClassCastException, NullPointerException etc.
+String	        imutabil, == vs equals, StringBuilder
+Polimorfism	    late binding, dynamic dispatch
+Modificatori	  public/private/protected/default
