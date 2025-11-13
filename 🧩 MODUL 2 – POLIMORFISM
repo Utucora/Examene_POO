@@ -1,0 +1,351 @@
+🟦 I. Teorie esențială – tot ce poate pica la examen
+
+🔹 1. Ce este polimorfismul
+Polimorfism = posibilitatea de a trata mai multe obiecte diferite printr-o singură interfață (tip comun).
+Adică:
+Animal a = new Dog();
+Animal b = new Cat();
+Ambele sunt Animal, dar se comportă diferit.
+
+🔹 2. Upcasting (super important!)
+Upcast = când o referință de subclasă este tratată ca superclasă.
+Exemplu:
+Dog d = new Dog();
+Animal a = d;  // upcast
+
+✔ Este sigur
+✔ Se face automat
+✔ Se folosește la polimorfism
+La upcast, apelurile de metode sunt rezolvate la RUNTIME → dynamic dispatch (late binding).
+Exemplu:
+Animal a = new Dog();
+a.speak();   // apelează Dog.speak()
+
+
+🔹 3. Downcasting
+Downcast = transformi o referință de superclasă în subclasă.
+Exemplu:
+
+Animal a = new Dog();
+Dog d = (Dog) a;
+
+✔ dacă obiectul real este Dog → OK
+
+❌ dacă NU → ClassCastException
+Exemplu greșit:
+
+Animal a = new Animal();
+Dog d = (Dog) a;  // runtime error!
+
+
+
+🔹 4. Overriding (suprascriere)
+O subclasă redefinește o metodă din superclasă cu aceeași semnătură.
+Exemplu:
+class A { void f() { System.out.println("A"); } }
+class B extends A {
+    @Override
+    void f() { System.out.println("B"); }
+}
+
+
+Reguli:
+semnătura trebuie să fie IDENTICĂ
+tipul return poate fi covariant
+accesul poate fi mărit (protected → public), dar nu scăzut
+DOAR metodele de instanță se suprascriu
+static NU se poate suprascrie → doar hiding
+Super important:
+Apelul metodei override se alege la runtime → late binding.
+
+
+🔹 5. Overloading (supraincărcare)
+Două metode cu același nume, dar semnături diferite.
+Exemplu:
+void f(int x) {}
+void f(double y) {}
+void f(int x, int y) {}
+Reguli:
+trebuie schimbat: număr/ordine/tip parametri
+tipul de return NU contează
+se rezolvă la compilare → early binding
+
+
+🔹 6. Hiding vs Overriding
+Situație	          Ce se întâmplă
+metodă non-static	  overriding
+metodă static	      hiding (nu e overriding)
+atribute	          hiding (niciodată overriding)
+Exemplu:
+
+class A { static void f() {} }
+class B extends A { static void f() {} }  // hiding, nu override
+Apelul se rezolvă după tipul referinței, nu al obiectului.
+
+
+🔹 7. Binding (legare)
+Tip	                    Când?	              Exemple
+Early binding	      la compilare  	overloading, static, private
+Late binding	      la runtime	          overriding
+
+
+
+🔹 8. Tip static vs tip dinamic
+Tip static → tipul referinței (compile-time)
+Tip dinamic → tipul obiectului real (runtime)
+Exemplu:
+Animal a = new Dog();
+tip static: Animal
+tip dinamic: Dog
+La examen apar întrebări:
+“Ce metodă se apelează?” → după tipul dinamic
+“Ce membru se accesează?” → după tipul static
+
+
+
+
+
+
+
+
+1. Ce se afișează?
+class A {
+    void f() { System.out.println("A"); }
+}
+
+class B extends A {
+    void f() { System.out.println("B"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new B();
+        a.f();
+    }
+}
+A. A
+B. B
+C. eroare
+D. depinde de compilator
+
+
+
+2. Ce se afișează?
+class A {
+    static void f() { System.out.println("A"); }
+}
+class B extends A {
+    static void f() { System.out.println("B"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new B();
+        a.f();
+    }
+}
+A. A
+B. B
+C. eroare
+D. NullPointerException
+
+
+3. Ce se întâmplă?
+Animal a = new Dog();
+Dog d = (Dog) a;
+A. compilează și rulează
+B. compilează dar dă runtime error
+C. eroare la compilare
+D. eroare doar dacă Dog nu suprascrie metode
+
+
+4. Ce se întâmplă?
+Animal a = new Animal();
+Dog d = (Dog) a;
+A. compilează fără eroare
+B. runtime error (ClassCastException)
+C. eroare la compilare
+D. rulează normal
+
+
+5. Ce este adevărat despre overriding?
+A. tipul de return nu poate fi schimbat niciodată
+B. metoda din subclasă trebuie să fie statică
+C. accesul poate deveni mai permisiv (ex. protected → public)
+D. metoda suprascrisă trebuie să fie final
+
+
+6. Selectați afirmația corectă despre overloading:
+A. se bazează pe numele metodei și tipul de return
+B. se bazează pe semnătura metodei
+C. necesită moștenire
+D. se decide la runtime
+
+
+7. Ce se afișează?
+class A {
+    void f(int x) { System.out.println("int"); }
+    void f(double x) { System.out.println("double"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new A();
+        a.f(5);
+    }
+}
+A. int
+B. double
+C. eroare
+D. depinde de VM
+
+
+
+8. Ce se afișează?
+class A {
+    void f(Object o) { System.out.println("Object"); }
+}
+class B extends A {
+    void f(String s) { System.out.println("String"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new B();
+        a.f("abc");
+    }
+}
+A. Object
+B. String
+C. eroare
+D. null
+
+
+
+
+9. Care metodă se apelează?
+class A {
+    void f() { System.out.println("A"); }
+}
+class B extends A {
+    void f() { System.out.println("B"); }
+}
+class C extends B {
+    void f() { System.out.println("C"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A a = new C();
+        a.f();
+    }
+}
+A. A
+B. B
+C. C
+D. eroare
+
+
+
+
+
+10. Ce tip de binding se folosește la overriding?
+A. static
+B. early
+C. late
+D. compile-time
+
+
+
+
+1. B deoarece metoda se ia din tipul dinamic. Pentru metode non-statice (override), se aplică 
+dynamic dispatch (late binding) → se ia implementarea din tipul dinamic (B).
+
+2. A, functia din clasa B isi ia hide deoarece e statica si nu poate fi overriden
+Metodele static NU se suprascriu → se ascund (hiding).
+Aici contează tipul static al referinței (A a).
+Deci se execută A.f().
+
+3. A, compileaza si ruleaza deoarece obiectul real(a) este dog 
+Obiectul real este Dog, deci downcast-ul este valid.
+Animal a = new Dog(); // ok
+Dog d = (Dog) a;      // ok
+
+
+4. B, runtime error ClassCastException 
+nimal a = new Animal();
+Dog d = (Dog) a; // ClassCastException
+Obiectul real NU este Dog → runtime error.
+
+
+5. C, metoda suprascrisa poate devenni mai permisiva 
+Regulă importantă:
+în overriding poți mări nivelul de acces (protected → public)
+nu ai voie să îl restrângi
+
+
+6. B
+Răspuns corect: B
+Explicație:
+Overloading nu necesită moștenire — absolut deloc.
+Funcționează complet în interiorul aceleiași clase, chiar și fără nicio moștenire.
+Exemplu:
+void f(int x) {}
+void f(double y) {}
+Asta este supraincărcare.
+Regula exactă:
+Overloading se bazează pe semnătura metodei.
+Deci răspunsul corect este:
+B. se bazează pe semnătura metodei
+
+
+
+
+7. A, int, deoarece argumentul pasat e de tip int
+a.f(5); // 5 e literal int → se apelează metoda cu parametru int
+
+
+
+
+8.  A, Object
+✔ Răspuns corect: A — “Object”
+Aici e capcana supremă și toți studenții calcă în ea:
+Explicație importantă:
+Polimorfismul (dynamic dispatch) funcționează doar pentru override, NU pentru overload.
+Aici NU ai overriding. Ai overloading în B.
+Cod:
+class A {
+    void f(Object o) { System.out.println("Object"); }
+}
+
+class B extends A {
+    void f(String s) { System.out.println("String"); }
+}
+În main:
+A a = new B(); 
+a.f("abc");
+Ce metode sunt vizibile din tipul A?
+→ doar f(Object)
+f(String) NU este vizibil prin referință de tip A.
+Deci se apelează A.f(Object), cu "abc" convertit la Object.
+➡️ Output: "Object"
+
+
+
+
+
+9. C , C
+Este overriding pe 3 niveluri.
+Dynamic dispatch → se ia metoda din tipul dinamic C.
+
+10. C, late binding
+Overriding folosește late binding (dynamic dispatch).
+
+
+
+
+
+
+
+
+
