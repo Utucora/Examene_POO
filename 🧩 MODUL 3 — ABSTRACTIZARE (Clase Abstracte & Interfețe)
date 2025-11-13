@@ -1,0 +1,285 @@
+🟦 I. TEORIE ESENȚIALĂ (TOT CE PICĂ LA EXAMEN)
+🔹 1. Clase abstracte
+O clasă abstractă:
+poate conține:
+✔ metode abstracte
+✔ metode concrete
+✔ câmpuri
+✔ constructori
+✔ blocuri normale
+nu poate fi instanțiată
+poate fi moștenită cu extends
+o subclasă care nu implementează toate metodele abstracte → devine abstractă
+
+abstract class Shape {
+    abstract double area();     // metodă abstractă
+    void print() {              // metodă concretă
+        System.out.println("Shape");
+    }
+}
+
+
+Reguli importante:
+o clasă abstractă poate avea constructor
+(foarte mulți greșesc la asta!)
+o clasă abstractă NU poate fi final
+o metodă abstractă NU poate fi finală sau private sau static
+
+
+🔹 2. Interfețe
+În Java modern (după Java 8+):
+O interfață poate conține:
+metode abstracte (implicit public abstract)
+metode default
+metode static
+câmpuri public static final (implicit)
+O clasă poate implementa oricâte interfețe.
+Exemplu:
+interface Drawable {
+    void draw();               // abstract
+    default void info() {      // default
+        System.out.println("Drawable");
+    }
+    static void help() {       // static
+        System.out.println("help");
+    }
+}
+
+🔹 3. Interfață vs Clasă abstractă — diferențe pentru examen
+Caracteristică	                  Interfață              	      Clasă abstractă
+Poate avea câmpuri?        	✔ dar doar public static final	      ✔ orice tip
+Poate avea constructor?              	❌	                              ✔
+Poate avea cod în metode?      	✔ default/static              	✔ metode concrete
+Moștenire multiplă?          	✔ (mai multe interfețe)	             ❌ doar una
+Poate fi instanțiată?	                ❌	                             ❌
+
+
+🔹 4. Default methods în interfețe
+
+interface I {
+    default void f() { System.out.println("I"); }
+}
+class A implements I {
+    public void f() { System.out.println("A"); }
+}
+✔ pot fi suprascrise
+✔ se moștenesc dacă nu sunt suprascrise
+✔ rezolvă “problema diamantului” cu regulă:
+“clasa câștigă în fața interfeței”
+
+
+
+🔹 5. Conflict de default methods
+Dacă două interfețe au aceeași metodă default → clasa trebuie să o rezolve:
+interface A { default void f() {} }
+interface B { default void f() {} }
+
+class C implements A, B {
+    public void f() { A.super.f(); } // obligatoriu override
+}
+
+
+🔹 6. Static methods în interfețe
+se apelează cu numele interfeței → I.m()
+nu se moștenesc de clasele care o implementează
+
+🔹 7. Când alegi clasă abstractă vs interfață?
+interfață → pentru comportament
+clasă abstractă → pentru structură comună + cod reutilizabil
+La examene apar întrebări gen:
+„Este corect aleasă interfața / clasa abstractă în cod?”
+
+
+
+
+
+1. Ce este adevărat despre clasele abstracte?
+A. Pot fi instanțiate
+B. Pot conține metode non-abstracte
+C. Trebuie să conțină cel puțin o metodă abstractă
+D. Nu pot avea constructori
+
+✔ CORECT: B
+Clasele abstracte pot conține metode concrete.
+Greșit la examen ar fi: “trebuie să aibă măcar o metodă abstractă” → FALS.
+
+
+2. Ce este adevărat despre interfețe?
+A. Pot avea variabile non-final
+B. Pot avea metode private
+C. Metodele default trebuie suprascrise în clase
+D. Toate metodele sunt implicit abstract și public
+
+✔ CORECT: D
+Explicație:
+Interfețele nu pot avea variabile non-final → A e fals.
+Interfețele pot avea metode private (din Java 9) → B e adevărată, dar nu e opțiunea corectă aici fiindcă există un răspuns mai bun.
+“Metodele default trebuie suprascrise” — FALS.
+✔ Corect este:
+D. Toate metodele sunt implicit abstract și public
+(cu excepția default / private / static)
+
+
+
+3. Ce se întâmplă aici?
+abstract class A {
+    abstract void f();
+    void g() { System.out.println("A"); }
+}
+
+class B extends A {}
+
+
+A. Compilează fără probleme
+B. Eroare: B trebuie să implementeze f()
+C. Eroare: g() trebuie să fie abstractă
+D. Eroare: A nu poate avea metode concrete
+
+
+✔ CORECT: B
+B nu implementează f(), deci trebuie să fie declarată abstractă.
+
+
+
+4. Ce se afișează?
+interface I {
+    default void f() { System.out.println("I"); }
+}
+
+class A implements I {
+    public void f() { System.out.println("A"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        I i = new A();
+        i.f();
+    }
+}
+A. I
+B. A
+C. eroare
+D. depinde de compilator
+
+✔ CORECT: B
+Da, este overriding.
+
+
+5. Ce se întâmplă?
+interface A { default void f() {} }
+interface B { default void f() {} }
+
+class C implements A, B {}
+A. totul e ok
+B. eroare la compilare
+C. se execută f() din A
+D. se execută f() din B
+
+
+✔ CORECT: B
+
+Dacă două interfețe conțin aceeași metodă default:
+interface A { default void f() {} }
+interface B { default void f() {} }
+
+class C implements A, B {}
+→ Eroare de compilare: „duplicate default methods”.
+Clasa C este OBLIGATĂ să rezolve conflictul:
+
+
+6. Care este adevărată?
+A. O interfață poate extinde o clasă
+B. O clasă abstractă poate implementa interfețe
+C. O clasă poate extinde mai multe clase abstracte
+D. O interfață poate avea constructori
+
+✔ CORECT: B
+O clasă abstractă POATE implementa interfețe.
+O interfață NU poate extinde o clasă.
+O clasă NU poate extinde mai multe clase.
+Interfețele NU au constructori.
+
+
+7. Ce este adevărat despre metodele default?
+A. pot fi private
+B. pot fi finale
+C. pot fi suprascrise
+D. trebuie apelate cu numele interfeței
+
+7. Ai răspuns: C
+✔ CORECT: C
+Metodele default pot fi suprascrise.
+
+
+8. Ce se întâmplă?
+interface X { void f(); }
+abstract class Y implements X {}
+class Z extends Y {}
+A. Z este abstractă
+B. Z trebuie să implementeze f()
+C. Codul compilează fără probleme
+D. Y nu poate implementa X
+
+✔ CORECT: B
+Analizăm:
+interface X { void f(); }   // metodă abstractă
+abstract class Y implements X {}  // Y nu implementează f() → e abstractă
+class Z extends Y {} // Z NU implementează f() → trebuie și ea să fie abstractă
+Dar Z nu e declarată abstract, deci este obligată să implementeze f().
+→ B este corect.
+Z trebuie să implementeze f(), altfel avem eroare.
+
+
+9. Ce se întâmplă?
+interface I {
+    static void f() {}
+}
+
+class A implements I {
+    void test() {
+        f();
+    }
+}
+
+A. Compilează
+B. Eroare: trebuie scris I.f()
+C. Eroare: f() nu poate fi static
+D. Eroare: test() trebuie să fie static
+
+✔ CORECT: B
+Explicație esențială:
+Metodele statice din interfețe NU sunt moștenite de clasele care le implementează.
+interface I { static void f() {} }
+class A implements I {
+    void test() {
+        f(); // ❌ eroare
+    }
+}
+Trebuie:
+I.f();  // ✔
+
+
+
+10. Ce este adevărat?
+A. O clasă abstractă trebuie să implementeze toate metodele interfeței pe care o implementează
+B. Interfețele pot extinde alte interfețe
+C. Metodele abstracte pot fi private
+D. Clasa abstractă nu poate avea câmpuri
+
+Interfețele pot extinde alte interfețe (moștenire multiplă).
+Celelalte sunt false.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
