@@ -1,0 +1,245 @@
+(public / private / protected / default)
+
+🟦 I. TEORIE ESENȚIALĂ (TOT CE TREBUIE SĂ ȘTII PENTRU EXAMEN)
+Java are 4 modificatori de acces:
+public
+private
+protected
+(default) → fără modificator
+Ei controlează vizibilitatea în clase, pachete și moștenire.
+
+🔥 1. public
+Cel mai permisiv.
+→ poate fi accesat de oriunde.
+public int x = 5;
+Se aplică la:
+clase (doar top-level)
+metode
+atribute
+constructori
+
+
+🔥 2. private
+Cel mai restrictiv.
+→ accesibil numai în clasa în care e definit.
+private int x = 5;
+Important:
+NU poate fi accesat în subclasă
+NU poate fi accesat din același pachet
+DOAR clasa curentă îl poate vedea
+metodele private NU se pot suprascrie (nici măcar nu există în subclasă!)
+
+
+🔥 3. default (fără modificator)
+Dacă nu scrii nimic:
+int x = 5;   // default
+→ vizibil în același pachet
+→ NU vizibil în alte pachete
+→ NU vizibil în subclase din pachete diferite
+Foarte des apare în grile ca:
+“Vizibil doar în pachet → default”.
+
+
+🔥 4. protected
+AICI E CAPCANA MARE.
+→ Vizibil în:
+clasa curentă
+același pachet
+subclase (chiar și din pachete diferite!)
+Dar ATENȚIE:
+Într-o subclasă din alt pachet poți accesa protected NUMAI prin moștenire, NU prin obiect.
+Exemplu (capcană reală la examen):
+package p1;
+public class A {
+    protected int x = 5;
+}
+
+package p2;
+class B extends A {
+    void f() {
+        System.out.println(x);       // ✔ ok
+        A a = new A();
+        // System.out.println(a.x);  // ❌ eroare
+    }
+}
+
+
+
+
+🟦 II. TABEL REZUMAT (foarte important la examene)
+Modificator    	În aceeași clasă	În același pachet	      În subclasă ACELAȘI pachet	În subclasă ALT pachet	          În afara pachetului (fără moștenire)
+public	            ✔	                  ✔	                      ✔                            	✔                                	✔
+protected	          ✔	                  ✔	                      ✔	                            ✔ (dar doar prin this/super)	    ❌
+default	            ✔	                  ✔	                      ✔	                            ❌	                              ❌
+private	            ✔	                  ❌	                    ❌	                          ❌	                              ❌
+
+
+Cel mai bun mod de a reține:
+public > protected > default > private
+
+
+🟦 III. EXEMPLE RELEVANTE (care pică în grile)
+1. private NU poate fi accesat în subclasă
+class A {
+    private int x = 10;
+}
+
+class B extends A {
+    void f() {
+        // System.out.println(x); // ❌ eroare
+    }
+}
+
+2. default NU trece granița de pachet
+package p1;
+class A {
+    int x = 3; // default
+}
+package p2;
+class B {
+    void f() {
+        A a = new A();
+        // a.x; // ❌
+    }
+}
+3. protected în alt pachet: se poate ACCESA DOAR PRIN MOȘTENIRE
+package p1;
+public class A {
+    protected int x = 10;
+}
+package p2;
+public class B extends A {
+    void f() {
+        System.out.println(this.x); // ✔ OK
+        A a = new A();
+        // System.out.println(a.x); // ❌ NU merge!
+    }
+}
+
+
+
+
+
+
+1. Ce este adevărat despre private?
+A. poate fi accesat în subclasă
+B. poate fi accesat doar în clasa curentă
+C. este vizibil în același pachet
+D. poate fi accesat doar prin moștenire
+
+✔ CORECT: B — private = vizibil doar în clasa curentă
+nu se vede în subclasă
+nu se vede în același pachet
+nu se moștenește în sensul de accesibilitate
+
+
+2. Dacă o metodă are modificator default, unde este vizibilă?
+A. doar în clasa curentă
+B. în clasa curentă și în același pachet
+C. doar în subclase
+D. în toate pachetele
+
+✔ CORECT: B — default = vizibil în același pachet
+Exact, default = package-private.
+Foarte mulți studenți cred că “default” înseamnă ceva legat de moștenire — greșit.
+
+
+
+3. Ce se întâmplă?
+package p1;
+public class A {
+    protected int x = 4;
+}
+
+package p2;
+public class B extends A {
+    void f() {
+        A a = new A();
+        System.out.println(a.x);
+    }
+}
+A. afișează 4
+B. eroare de compilare
+C. afișează un garbage value
+D. afișează 0
+
+
+✔ CORECT: B — eroare de compilare
+Situația clasică:
+A a = new A();
+System.out.println(a.x); // în alt pachet → NU merge
+Protected în alt pachet merge NUMAI prin moștenire, adică:
+System.out.println(this.x); // OK
+dar NU prin:
+a.x; // ❌
+
+
+
+4. Ce se întâmplă?
+class A {
+    private int x = 10;
+}
+class B extends A {
+    void f() {
+        System.out.println(x);
+    }
+}
+A. afișează 10
+B. afișează 0
+C. eroare: x este privat
+D. afișează null
+
+✔ CORECT: C — x este privat și nu poate fi accesat în subclasă
+class A { private int x; }
+class B extends A { void f() { x; } } // eroare
+Important:
+private nu se moștenește în sensul de vizibilitate
+se moștenește ca “parte a obiectului”, dar nu ai acces la el
+
+
+
+
+5. protected permite acces din alt pachet dacă:
+A. clasa este finală
+B. membrul este accesat printr-un obiect al clasei părinte
+C. membrul este accesat prin moștenire (prin this/super)
+D. membrul este static
+
+✔ CORECT: C — protected funcționează între pachete doar prin moștenire
+Foarte important la examen:
+✔ poți scrie:
+this.x;
+super.x;
+❌ dar NU poți scrie:
+new A().x; // eroare în alt pachet
+
+
+
+6. O clasă fără modificator este:
+A. public
+B. private
+C. default (package-private)
+D. protected
+
+✔ CORECT: C — default (package-private)
+O clasă fără modificator este vizibilă doar în pachet.
+
+
+7. Metodele private:
+A. se pot suprascrie
+B. nu se pot suprascrie
+C. pot fi accesate în subclase
+D. pot fi apelate prin obiecte din alte pachete
+
+✔ CORECT: B — metodele private NU se pot suprascrie
+Explicație importantă:
+De fapt, dacă ai:
+class A { private void f(){} }
+class B extends A { private void f(){} }
+Metoda din B NU este overriding, ci este o metodă complet nouă → metodele private nu participă la polimorfism.
+
+
+
+
+
+
