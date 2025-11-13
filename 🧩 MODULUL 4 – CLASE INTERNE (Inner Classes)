@@ -1,0 +1,288 @@
+Java are 4 tipuri de clase interne:
+1️⃣ Inner class non-static
+2️⃣ Static nested class
+3️⃣ Local class (într-o metodă)
+4️⃣ Anonymous class
+La examen pică întrebări de genul:
+“Poate o clasă internă anonimă să aibă constructor?” → NU
+“Are acces la membrii exteriori?” → depinde
+“Cum se instanțiază o inner class?”
+“Ce înseamnă shadowing?”
+“Ce poate și nu poate fi static?”
+
+
+🟦 I. TEORIE ESENȚIALĂ
+🔹 1. INNER CLASS NON-STATIC (cea mai comună)
+Este o clasă declarată în interiorul altei clase, fără static.
+class Outer {
+    private int x = 10;
+
+    class Inner {
+        void print() { System.out.println(x); }
+    }
+}
+
+Proprietăți:
+are acces la toți membrii clasei exterioare (chiar și private)
+NU poate avea membri statici
+se instanțiază printr-un obiect exterior:
+
+Outer o = new Outer();
+Outer.Inner i = o.new Inner();
+
+🔹 2. STATIC NESTED CLASS
+class Outer {
+    static class Inner {
+        void print() { System.out.println("hello"); }
+    }
+}
+Proprietăți:
+poate avea membri statici
+NU are acces la membrii non-statici ai clasei exterioare
+(se comportă ca o clasă obișnuită, dar cu namespace Outer)
+
+se instanțiază fără obiect exterior:
+Outer.Inner i = new Outer.Inner();
+
+
+🔹 3. LOCAL CLASS (în interiorul unei metode)
+void f() {
+    class Local {
+        void g() { System.out.println("local"); }
+    }
+    Local l = new Local();
+    l.g();
+}
+Proprietăți:
+vizibilă doar în interiorul metodei
+poate accesa variabilele final sau efectiv final din metodă
+nu poate avea membri statici (cu excepția constantelor)
+
+🔹 4. ANONYMOUS CLASS (torpila examenului)
+Definiție:
+O clasă fără nume, definită pentru a extinde o clasă sau a implementa o interfață.
+Exemplu:
+Button b = new Button();
+b.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick() {
+        System.out.println("clicked");
+    }
+});
+
+SUPER IMPORTANT:
+NU poate avea constructor propriu → NU poți scrie:
+new Interface() {
+    Interface() { } // ❌ NU
+};
+
+Poate suprascrie metode
+Are acces la variabile finale / efectiv finale din metoda curentă
+Creează UN SINGUR obiect
+
+
+🔹 5. Diferențe importante (pe care le vânează grilele)
+
+Tip	                  Poate avea    Necesită instanță Outer?   Acces la membri Outer
+                    membri statici?		
+Inner non-static	          ❌	         ✔	                     ✔ (inclusiv private)
+Static nested	               ✔         	❌	                    ❌  doar la static
+Local	                      ❌	        ❌	            doar variabile final / efectiv final
+Anonymous	                  ❌	        ❌	                    final / efectiv final
+
+
+🔹 6. Despre shadowing (capcană)
+Dacă ai:
+class Outer {
+    int x = 5;
+    class Inner {
+        int x = 10;
+        void f() {
+            System.out.println(x);          // 10
+            System.out.println(Outer.this.x); // 5
+        }
+    }
+}
+
+
+1. Ce este adevărat despre clasele interne anonime?
+A. pot avea constructori proprii
+B. pot suprascrie metode
+C. pot fi instantiate de mai multe ori
+D. pot avea membri statici
+
+✔ CORECT: B
+Clasele anonime:
+pot suprascrie metode
+NU pot avea constructori
+NU pot avea membri statici
+
+
+
+2. Ce se întâmplă?
+class Outer {
+    private int x = 7;
+
+    class Inner {
+        void print() { System.out.println(x); }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Outer.Inner i = new Outer().new Inner();
+        i.print();
+    }
+}
+A. 7
+B. eroare: nu poate accesa x
+C. eroare la instanțiere
+D. 0
+
+
+✔ CORECT: A
+Inner class non-static are acces la TOT din Outer, inclusiv private.
+
+
+3. Ce se întâmplă?
+class Outer {
+    static class Inner {
+        void print() { System.out.println("Hello"); }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Outer.Inner i = new Outer.Inner();
+        i.print();
+    }
+}
+A. eroare, Inner trebuie instanțiat prin Outer
+B. se afișează Hello
+C. eroare: inner class nu poate fi statică
+D. eroare: constructor invalid
+
+✔ CORECT: B
+Static nested class se instanțiază cu:
+Outer.Inner i = new Outer.Inner();
+
+
+4. Ce se întâmplă?
+class Test {
+    void f() {
+        int x = 10;
+        class Local {
+            void g() { System.out.println(x); }
+        }
+        new Local().g();
+    }
+}
+A. eroare, x trebuie să fie static
+B. afișează 10
+C. eroare, local class nu are acces la x
+D. eroare, local class trebuie să fie static
+
+✔ CORECT: B
+x din metodă este efectiv final, deci Local class îl poate accesa.
+
+
+5. Ce este adevărat?
+A. o local class poate avea membri statici
+B. o static nested class poate accesa membri non-statici ai clasei exterioare
+C. o inner class non-static are acces la membri private ai clasei exterioare
+D. o anonymous class trebuie să fie declarată abstract
+
+
+✔ CORECT: C
+Inner class non-static are acces total la Outer, inclusiv membri private.
+
+
+6. Ce se întâmplă?
+class Outer {
+    int x = 5;
+    class Inner {
+        int x = 10;
+        void f() {
+            System.out.println(x);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Outer().new Inner().f();
+    }
+}
+A. 5
+B. 10
+C. eroare: shadowing nepermis
+D. depinde
+
+✔ CORECT: B (10)
+Inner.x ascunde Outer.x.
+
+
+
+7. Cum se instanțiază o inner class NON-static?
+A. new Outer.Inner()
+B. new Inner()
+C. new Outer().Inner()
+D. new Outer().new Inner()
+
+
+✔ CORECT: D
+Exact așa:
+new Outer().new Inner();
+
+
+8. Care e adevărată?
+A. O anonymous class poate extinde o clasă și implementa o interfață simultan
+B. O anonymous class poate extinde o singură clasă SAU implementa o singură interfață
+C. O anonymous class nu poate suprascrie metode
+D. O anonymous class poate avea constructori
+
+✔ CORECT: B
+Anonymous class poate:
+fie să EXTINDĂ o clasă
+fie să IMPLEMENTEZE o interfață
+dar doar una, nu ambele.
+
+
+
+9. Ce se întâmplă?
+class Outer {
+    static int y = 3;
+    int x = 10;
+    static class Inner {
+        void f() {
+            System.out.println(x);
+        }
+    }
+}
+A. afișează 10
+B. afișează 3
+C. eroare: Inner nu poate accesa x
+D. eroare: y trebuie să fie final
+
+✔ CORECT: C
+Static nested class nu are acces la membri non-statici ai clasei exterioare (x).
+
+
+
+10. Ce e adevărat?
+A. O inner class non-static apare în fișier ca Outer$Inner.class
+B. O anonymous class apare ca Outer.Inner
+C. O static nested class apare ca Inner.class
+D. O local class apare ca OuterLocal.class
+
+
+✔ CORECT: A
+Explicație importantă:
+
+Tip clasă                      	Compilată ca…
+Inner class non-static	        Outer$Inner.class
+Static nested class	            Outer$Inner.class (identic, e tot nested)
+Anonymous class	                Outer$1.class, Outer$2.class, etc.
+Local class                    	Outer$1Local.class
+
+
