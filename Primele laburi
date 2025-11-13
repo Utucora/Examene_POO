@@ -160,17 +160,150 @@ Static vs override — static se rezolvă la compile-time, override la run-time.
 
 
 
+✅ ÎNTREBAREA 2
+class Example {
+    int a = 10;
+    static int b = 20;
+
+    void f() { System.out.println(a + b); }
+    static void g() { System.out.println(a + b); }
+}
+🟩 Corect: B. Eroare – metoda statică nu poate accesa a.
+✔ a e non-static, aparține unui obiect.
+✔ g() e static — aparține clasei, nu are acces la this.
+❌ deci System.out.println(a + b) → eroare de compilare: non-static variable a cannot be referenced from a static context.
+
+
+
+✅ ÎNTREBAREA 3
+class A { A() { System.out.println("A"); } }
+class B extends A {
+    B() {
+        super();
+        System.out.println("B");
+    }
+}
+🟩 Corect: C. se afișează A apoi B.
+✔ super() apelează constructorul clasei părinte.
+✔ Chiar dacă nu ai scrie super(), Java îl pune implicit ca prima linie în constructor.
+Deci oricum s-ar afișa A, apoi B.
+
+
+
+
+✅ ÎNTREBAREA 4
+class A { A() { System.out.println("A"); } }
+class B extends A {
+    B() { this(5); System.out.println("B"); }
+    B(int x) { System.out.println("B int"); }
+}
+🟩 Corect: C. A → B int → B
+✔ Ordinea:
+new B() → apelează constructorul fără parametri
+this(5) → apelează constructorul B(int)
+înainte de B(int), se apelează implicit super() (→ A)
+apoi B int
+apoi B
+➡️ deci A → B int → B
+
+💬 Diferența “parametru” vs “argument”:
+Parametru = variabila definită în semnătura metodei (int x)
+Argument = valoarea efectivă transmisă la apel (this(5) → 5 e argument)
+
+
+✅ ÎNTREBAREA 5
+class Demo {
+    int x = 5;
+    Demo() { System.out.println(this.x); }
+}
+🟩 Corect: B. 5
+✔ x e inițializat la 5 înainte de executarea constructorului.
+✔ this se referă la instanța curentă.
+
+
+
+
+6. Ce este adevărat despre this?
+A. poate fi folosit într-o metodă statică
+B. poate apela alt constructor din aceeași clasă
+C. se referă la superclasă
+D. poate fi folosit înainte de super()
+
+✅ ÎNTREBAREA 6
+🟩 Corect: B. poate apela alt constructor din aceeași clasă.
+✔ this(...) → apelează alt constructor
+✔ nu poate fi folosit în static context
+✔ this() trebuie să fie prima linie din constructor
+
+
+
+
+✅ ÎNTREBAREA 7
+🟩 Corect: B. super() trebuie să fie prima instrucțiune din constructor.
+✔ altfel → eroare de compilare (“Constructor call must be the first statement”).
+
+
+✅ ÎNTREBAREA 8
+class A { int x = 10; }
+class B extends A {
+    int x = 20;
+    void print() { System.out.println(super.x); }
+}
+🟩 Corect: A. 10
+✔ super.x accesează atributul clasei părinte chiar dacă e ascuns de cel din subclasă.
+✔ nu e eroare — shadowing (ascunderea variabilei părinte) e permis în Java.
+
+
+
+
+9. Ce afișează:
+class Counter {
+    static int count = 0;
+    Counter() { count++; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Counter();
+        new Counter();
+        Counter c = new Counter();
+        System.out.println(c.count);
+    }
+}
+A. 1
+B. 2
+C. 3
+D. 0
+
+
+✅ ÎNTREBAREA 9
+🟩 Corect: C. 3
+✔ Fiecare new Counter() incrementează count.
+✔ E static → comun tuturor instanțelor.
+✔ După 3 apeluri, count = 3.
+
+
+
+
+10. Ce se întâmplă dacă NU apelăm explicit super() într-un constructor de subclasă?
+A. se apelează automat super() fără parametri
+B. programul nu compilează niciodată
+C. se apelează this()
+D. superclasa nu este inițializată
+
+✅ ÎNTREBAREA 10
+🟩 Corect: A. dacă nu apelăm explicit super(), Java apelează implicit constructorul fără parametri din superclasă.
+✔ Dacă superclasa nu are constructor fără parametri, compilarea eșuează.
 
 
 
 
 
-
-
-
-
-
-
-
-
-
+🔥 REZUMAT FOARTE SCURT – TOT CE TREBUIE SĂ REȚII AICI
+Concept	                Esențial
+static	                aparține clasei, nu obiectului; metodele statice nu accesează this; nu se moștenesc dinamic
+this	                referință la instanța curentă; folosit în constructori; NU se poate în static
+super	                referință la superclasă; apelează constructorul părinte; prima linie în constructor
+upcast	                sigur, automată; tratezi subclasa ca superclasă; folosit în polimorfism
+downcast            	manual, riscant; poate da ClassCastException
+constructori	        nu se moștenesc; apel implicit super() dacă nu e scris
