@@ -1,0 +1,109 @@
+🔹 1. Ierarhia excepțiilor
+Object
+ └── Throwable
+      ├── Error
+      └── Exception
+           ├── RuntimeException  (unchecked)
+           └── NO RuntimeException (checked)
+✔ Checked exceptions
+→ trebuie tratate în cod sau declarate cu throws.
+Exemple:
+IOException
+FileNotFoundException
+SQLException
+✔ Unchecked exceptions
+→ NU trebuie tratate
+→ apar în majoritatea grilelor.
+Exemple:
+NullPointerException
+ArrayIndexOutOfBoundsException
+ArithmeticException
+ClassCastException
+IllegalArgumentException
+NumberFormatException
+
+
+🔹 2. try / catch / finally
+✔ finally se execută întotdeauna
+→ chiar dacă ai return în try
+→ chiar dacă ai excepție
+→ chiar dacă ai alt return în catch
+→ SINGURA situație când nu se execută: se oprește JVM (System.exit())
+✔ poți avea try fără catch, dar cu finally:
+try { ... } finally { ... }
+
+
+
+🔹 3. Ordinea blocurilor catch (capcană)
+Se prind excepțiile de la cel mai specific la cel mai general.
+Exemplu GREȘIT:
+catch(Exception e) {}
+catch(IOException e) {} // never reached → eroare
+
+
+
+🔹 4. propagate vs handle
+handle: ai try/catch
+propagate: folosești throws Exception
+
+
+🔹 5. Cele mai importante excepții (apar în 90% din grile)
+
+✔ NullPointerException
+String s = null;
+s.length(); // NPE
+
+✔ ArrayIndexOutOfBoundsException
+int[] a = new int[3];
+a[5] = 1; // out of bounds
+
+✔ ClassCastException
+Object o = "abc";
+Integer x = (Integer) o; // ClassCastException
+
+✔ ArithmeticException
+int x = 5 / 0;
+
+✔ NumberFormatException
+Integer.parseInt("abc");
+
+✔ IllegalArgumentException
+Thread.sleep(-5);
+
+
+🔹 6. CAPCANE try/catch/finally
+
+CAPCANA #1
+
+Return în try, finally se execută oricum:
+try {
+    return 1;
+} finally {
+    System.out.println("finally");
+}
+Tipic rezultat:
+→ se afișează "finally"
+→ metoda returnează 1
+
+
+CAPCANA #2
+
+Dacă finally are return → anulează orice alt return:
+try {
+    return 1;
+} finally {
+    return 2;
+}
+Rezultat: 2
+⚠️ Întrerupe complet logica metodei.
+
+
+CAPCANA #3
+
+Excepția aruncată în finally suprascrie excepția din try.
+try {
+    throw new RuntimeException("A");
+} finally {
+    throw new RuntimeException("B");
+}
+Rezultatul: DOAR “B” se propagate.
